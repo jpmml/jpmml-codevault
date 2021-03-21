@@ -143,7 +143,7 @@ public class UnlockingURLClassLoaderTest {
 		String entryName = (_package.name()).replace('.', '/') + "/" + clazz.name() + ".class";
 
 		keyRegistry.putAttributes(entryName, attributes);
-		keyRegistry.putSecretKeyBytes(secretKeyId, secretKey.getEncoded());
+		keyRegistry.putEncodedKey(secretKeyId, secretKey.getEncoded());
 
 	}
 }

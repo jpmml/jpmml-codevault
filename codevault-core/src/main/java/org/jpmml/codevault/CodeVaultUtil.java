@@ -4,9 +4,9 @@
 package org.jpmml.codevault;
 
 import java.security.GeneralSecurityException;
+import java.security.Key;
 
 import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
 
 public class CodeVaultUtil {
 
@@ -14,17 +14,17 @@ public class CodeVaultUtil {
 	}
 
 	static
-	public byte[] lock(SecretKey secretKey, byte[] content) throws GeneralSecurityException {
-		Cipher cipher = Cipher.getInstance(secretKey.getAlgorithm());
-		cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+	public byte[] lock(Key key, byte[] content) throws GeneralSecurityException {
+		Cipher cipher = Cipher.getInstance(key.getAlgorithm());
+		cipher.init(Cipher.ENCRYPT_MODE, key);
 
 		return cipher.doFinal(content);
 	}
 
 	static
-	public byte[] unlock(SecretKey secretKey, byte[] content) throws GeneralSecurityException {
-		Cipher cipher = Cipher.getInstance(secretKey.getAlgorithm());
-		cipher.init(Cipher.DECRYPT_MODE, secretKey);
+	public byte[] unlock(Key key, byte[] content) throws GeneralSecurityException {
+		Cipher cipher = Cipher.getInstance(key.getAlgorithm());
+		cipher.init(Cipher.DECRYPT_MODE, key);
 
 		return cipher.doFinal(content);
 	}

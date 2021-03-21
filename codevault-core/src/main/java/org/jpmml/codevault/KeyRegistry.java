@@ -21,7 +21,7 @@ public class KeyRegistry {
 
 	private Map<String, Attributes> attributes = new LinkedHashMap<>();
 
-	private Map<String, byte[]> secretKeyBytes = new LinkedHashMap<>();
+	private Map<String, byte[]> encodedKeys = new LinkedHashMap<>();
 
 
 	public KeyRegistry(){
@@ -78,12 +78,12 @@ public class KeyRegistry {
 			String algorithm = (String)attributes.get(AttributeNames.CODEVAULT_ALGORITHM);
 			String secretKeyId = (String)attributes.get(AttributeNames.CODEVAULT_SECRETKEY_ID);
 
-			byte[] secretKeyBytes = getSecretKeyBytes(secretKeyId);
-			if(secretKeyBytes == null){
+			byte[] encodedKey = getEncodedKey(secretKeyId);
+			if(encodedKey == null){
 				throw new IllegalArgumentException();
 			}
 
-			return new SecretKeySpec(secretKeyBytes, algorithm);
+			return new SecretKeySpec(encodedKey, algorithm);
 		}
 
 		return null;
@@ -99,12 +99,12 @@ public class KeyRegistry {
 		putAttributesInternal(name, attributes);
 	}
 
-	public byte[] getSecretKeyBytes(String id){
-		return this.secretKeyBytes.get(id);
+	public byte[] getEncodedKey(String id){
+		return this.encodedKeys.get(id);
 	}
 
-	public void putSecretKeyBytes(String id, byte[] bytes){
-		this.secretKeyBytes.put(id, bytes);
+	public void putEncodedKey(String id, byte[] bytes){
+		this.encodedKeys.put(id, bytes);
 	}
 
 	private void putAttributesInternal(String name, Attributes attributes){
