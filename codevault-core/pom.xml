@@ -21,6 +21,12 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>org.jpmml</groupId>
+			<artifactId>jpmml-codemodel</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 		</dependency>
