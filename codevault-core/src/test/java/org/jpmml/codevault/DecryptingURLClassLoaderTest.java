@@ -31,7 +31,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-public class UnlockingURLClassLoaderTest {
+public class DecryptingURLClassLoaderTest {
 
 	@Test
 	public void encryptAndDecrypt() throws Exception {
@@ -108,7 +108,7 @@ public class UnlockingURLClassLoaderTest {
 			}
 		}
 
-		try(URLClassLoader classLoader = new UnlockingURLClassLoader(urls, keyRegistry)){
+		try(URLClassLoader classLoader = new DecryptingURLClassLoader(urls, keyRegistry)){
 			assertNotNull(classLoader.loadClass("a.A"));
 			assertNotNull(classLoader.loadClass("b.B"));
 			assertNotNull(classLoader.loadClass("c.C"));

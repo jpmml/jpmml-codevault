@@ -14,18 +14,18 @@ import java.util.jar.Attributes;
 
 import javax.crypto.SecretKey;
 
-public class UnlockingURLClassLoader extends URLClassLoader {
+public class DecryptingURLClassLoader extends URLClassLoader {
 
 	private KeyRegistry keyRegistry = null;
 
 
-	public UnlockingURLClassLoader(URL[] urls, KeyRegistry keyRegistry){
+	public DecryptingURLClassLoader(URL[] urls, KeyRegistry keyRegistry){
 		super(urls);
 
 		setKeyRegistry(keyRegistry);
 	}
 
-	public UnlockingURLClassLoader(URL[] urls, ClassLoader parent, KeyRegistry keyRegistry){
+	public DecryptingURLClassLoader(URL[] urls, ClassLoader parent, KeyRegistry keyRegistry){
 		super(urls, parent);
 
 		setKeyRegistry(keyRegistry);

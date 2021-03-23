@@ -28,10 +28,10 @@ import org.jpmml.codevault.CodeVaultUtil;
 import org.jpmml.codevault.KeyRegistry;
 
 @Mojo (
-	name = "lock",
+	name = "encrypt",
 	defaultPhase = LifecyclePhase.PREPARE_PACKAGE
 )
-public class LockMojo extends AbstractMojo {
+public class EncryptMojo extends AbstractMojo {
 
 	@Parameter (
 		defaultValue = "${project}",
