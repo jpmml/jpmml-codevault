@@ -14,7 +14,7 @@ public class CodeVaultUtil {
 	}
 
 	static
-	public byte[] lock(Key key, byte[] content) throws GeneralSecurityException {
+	public byte[] encrypt(Key key, byte[] content) throws GeneralSecurityException {
 		Cipher cipher = Cipher.getInstance(key.getAlgorithm());
 		cipher.init(Cipher.ENCRYPT_MODE, key);
 
@@ -22,7 +22,7 @@ public class CodeVaultUtil {
 	}
 
 	static
-	public byte[] unlock(Key key, byte[] content) throws GeneralSecurityException {
+	public byte[] decrypt(Key key, byte[] content) throws GeneralSecurityException {
 		Cipher cipher = Cipher.getInstance(key.getAlgorithm());
 		cipher.init(Cipher.DECRYPT_MODE, key);
 

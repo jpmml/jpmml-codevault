@@ -121,7 +121,7 @@ public class LockMojo extends AbstractMojo {
 			}
 
 			try {
-				content = CodeVaultUtil.lock(secretKey, content);
+				content = CodeVaultUtil.encrypt(secretKey, content);
 			} catch(GeneralSecurityException gse){
 				throw new MojoExecutionException("Error encrypting", gse);
 			}

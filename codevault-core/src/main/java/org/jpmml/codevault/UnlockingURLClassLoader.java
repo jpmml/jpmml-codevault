@@ -99,7 +99,7 @@ public class UnlockingURLClassLoader extends URLClassLoader {
 			}
 
 			try {
-				bytes = CodeVaultUtil.unlock(secretKey, bytes);
+				bytes = CodeVaultUtil.decrypt(secretKey, bytes);
 			} catch(GeneralSecurityException gse){
 				throw new ClassNotFoundException(name, gse);
 			}

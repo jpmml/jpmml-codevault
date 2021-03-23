@@ -34,7 +34,7 @@ import static org.junit.Assert.fail;
 public class UnlockingURLClassLoaderTest {
 
 	@Test
-	public void lockAndUnlock() throws Exception {
+	public void encryptAndDecrypt() throws Exception {
 		JCodeModel codeModel = new JCodeModel();
 
 		JDefinedClass clazzA = codeModel._package("a")._class("A");
@@ -67,11 +67,11 @@ public class UnlockingURLClassLoaderTest {
 
 		SecretKey secretKey = keyGenerator.generateKey();
 
-		lock(keyRegistry, clazzA, secretKey);
+		encrypt(keyRegistry, clazzA, secretKey);
 
 		secretKey = keyGenerator.generateKey();
 
-		lock(keyRegistry, clazzC, secretKey);
+		encrypt(keyRegistry, clazzC, secretKey);
 
 		try(OutputStream os = new FileOutputStream(tmpFile)){
 			Manifest manifest = keyRegistry.toManifest();
@@ -116,7 +116,7 @@ public class UnlockingURLClassLoaderTest {
 	}
 
 	static
-	private void lock(KeyRegistry keyRegistry, JDefinedClass clazz, SecretKey secretKey) throws GeneralSecurityException, ReflectiveOperationException {
+	private void encrypt(KeyRegistry keyRegistry, JDefinedClass clazz, SecretKey secretKey) throws GeneralSecurityException, ReflectiveOperationException {
 		JPackage _package = clazz.getPackage();
 
 		for(Iterator<JResourceFile> it = _package.propertyFiles(); it.hasNext(); ){
@@ -130,7 +130,7 @@ public class UnlockingURLClassLoaderTest {
 					bytesField.setAccessible(true);
 				}
 
-				bytesField.set(classFile, CodeVaultUtil.lock(secretKey, (byte[])bytesField.get(classFile)));
+				bytesField.set(classFile, CodeVaultUtil.encrypt(secretKey, (byte[])bytesField.get(classFile)));
 			}
 		}
 
