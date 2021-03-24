@@ -164,6 +164,12 @@ public class EncryptMojo extends AbstractMojo {
 		FileUtil.ensureParentDirectory(manifestFile);
 
 		try(OutputStream os = new FileOutputStream(manifestFile)){
+			Attributes mainAttributes = manifest.getMainAttributes();
+
+			if(!mainAttributes.containsKey(AttributeNames.MANIFEST_VERSION)){
+				mainAttributes.put(AttributeNames.MANIFEST_VERSION, "1.0");
+			}
+
 			manifest.write(os);
 		} catch(IOException ioe){
 			throw new MojoExecutionException("Error writing manifest file", ioe);
