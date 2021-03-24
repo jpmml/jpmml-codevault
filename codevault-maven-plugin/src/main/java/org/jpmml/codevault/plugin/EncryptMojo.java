@@ -56,6 +56,11 @@ public class EncryptMojo extends AbstractMojo {
 	private File manifestFile;
 
 	@Parameter (
+		defaultValue = "CLASS"
+	)
+	private Scope scope;
+
+	@Parameter (
 		required = true
 	)
 	private String algorithm;
@@ -92,6 +97,7 @@ public class EncryptMojo extends AbstractMojo {
 			fileSet.setExcludes(Arrays.asList(excludes));
 		}
 
+		Scope scope = getScope();
 		String algorithm = getAlgorithm();
 		String secretKeyId = getSecretKeyId();
 		File secretKeyFile = getSecretKeyFile();
@@ -107,6 +113,18 @@ public class EncryptMojo extends AbstractMojo {
 		SecretKey secretKey = new SecretKeySpec(secretKeyContent, algorithm);
 
 		KeyRegistry keyRegistry = new KeyRegistry();
+
+		Attributes attributes = new Attributes();
+		attributes.put(AttributeNames.CODEVAULT_ALGORITHM, algorithm);
+		attributes.put(AttributeNames.CODEVAULT_SECRETKEY_ID, secretKeyId);
+
+		switch(scope){
+			case ARCHIVE:
+				keyRegistry.addMainAttributes(attributes);
+				break;
+			case CLASS:
+				break;
+		}
 
 		String[] includedFiles = fileSetManager.getIncludedFiles(fileSet);
 		for(String includedFile : includedFiles){
@@ -132,11 +150,13 @@ public class EncryptMojo extends AbstractMojo {
 				throw new MojoExecutionException("Error writing work file", ioe);
 			}
 
-			Attributes attributes = new Attributes();
-			attributes.put(AttributeNames.CODEVAULT_ALGORITHM, algorithm);
-			attributes.put(AttributeNames.CODEVAULT_SECRETKEY_ID, secretKeyId);
-
-			keyRegistry.addAttributes(includedFile, attributes);
+			switch(scope){
+				case ARCHIVE:
+					break;
+				case CLASS:
+					keyRegistry.addAttributes(includedFile, attributes);
+					break;
+			}
 		}
 
 		Manifest manifest = keyRegistry.getManifest();
@@ -190,6 +210,14 @@ public class EncryptMojo extends AbstractMojo {
 		this.manifestFile = manifestFile;
 	}
 
+	public Scope getScope(){
+		return this.scope;
+	}
+
+	public void setScope(Scope scope){
+		this.scope = scope;
+	}
+
 	public String getAlgorithm(){
 		return this.algorithm;
 	}
@@ -212,5 +240,12 @@ public class EncryptMojo extends AbstractMojo {
 
 	public void setSecretKeyFile(File secretKeyFile){
 		this.secretKeyFile = secretKeyFile;
+	}
+
+	static
+	public enum Scope {
+		ARCHIVE,
+		CLASS,
+		;
 	}
 }
