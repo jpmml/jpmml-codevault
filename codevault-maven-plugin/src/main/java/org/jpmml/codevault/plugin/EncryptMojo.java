@@ -51,7 +51,7 @@ public class EncryptMojo extends AbstractMojo {
 	private String[] excludes;
 
 	@Parameter (
-		defaultValue = "${project.build.directory}/classes/META-INF/MANIFEST.MF"
+		defaultValue = "${project.build.directory}/classes/META-INF/CODEVAULT.MF"
 	)
 	private File manifestFile;
 

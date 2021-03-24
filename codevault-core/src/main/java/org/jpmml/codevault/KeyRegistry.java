@@ -27,7 +27,7 @@ public class KeyRegistry {
 	}
 
 	public void load(ClassLoader classLoader) throws IOException {
-		Enumeration<URL> urls = classLoader.getResources("META-INF/MANIFEST.MF");
+		Enumeration<URL> urls = classLoader.getResources("META-INF/CODEVAULT.MF");
 
 		while(urls.hasMoreElements()){
 			URL url = urls.nextElement();
