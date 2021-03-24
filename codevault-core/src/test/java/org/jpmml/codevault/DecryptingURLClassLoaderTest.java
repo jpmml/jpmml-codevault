@@ -74,7 +74,7 @@ public class DecryptingURLClassLoaderTest {
 		encrypt(keyRegistry, clazzC, secretKey);
 
 		try(OutputStream os = new FileOutputStream(tmpFile)){
-			Manifest manifest = keyRegistry.toManifest();
+			Manifest manifest = keyRegistry.getManifest();
 
 			CodeWriter codeWriter = new JarCodeWriter(os, manifest);
 
@@ -142,8 +142,8 @@ public class DecryptingURLClassLoaderTest {
 
 		String entryName = (_package.name()).replace('.', '/') + "/" + clazz.name() + ".class";
 
-		keyRegistry.putAttributes(entryName, attributes);
-		keyRegistry.putEncodedKey(secretKeyId, secretKey.getEncoded());
+		keyRegistry.addAttributes(entryName, attributes);
 
+		keyRegistry.putEncodedKey(secretKeyId, secretKey.getEncoded());
 	}
 }

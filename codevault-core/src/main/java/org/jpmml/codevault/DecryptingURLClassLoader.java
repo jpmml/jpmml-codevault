@@ -38,7 +38,7 @@ public class DecryptingURLClassLoader extends URLClassLoader {
 		String entryName = toEntryName(name);
 
 		Attributes attributes = keyRegistry.getAttributes(entryName);
-		if(attributes != null){
+		if(attributes != null && !attributes.isEmpty()){
 
 			synchronized(getClassLoadingLock(name)){
 				Class<?> clazz = findLoadedClass(name);
@@ -92,8 +92,9 @@ public class DecryptingURLClassLoader extends URLClassLoader {
 		}
 
 		Attributes attributes = keyRegistry.getAttributes(entryName);
-		if(attributes != null){
-			SecretKey secretKey = keyRegistry.getSecretKey(entryName);
+		if(attributes != null && !attributes.isEmpty()){
+			SecretKey secretKey = keyRegistry.getSecretKey(attributes);
+
 			if(secretKey == null){
 				throw new ClassNotFoundException(name);
 			}

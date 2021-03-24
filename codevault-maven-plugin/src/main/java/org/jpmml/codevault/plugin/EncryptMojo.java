@@ -136,10 +136,10 @@ public class EncryptMojo extends AbstractMojo {
 			attributes.put(AttributeNames.CODEVAULT_ALGORITHM, algorithm);
 			attributes.put(AttributeNames.CODEVAULT_SECRETKEY_ID, secretKeyId);
 
-			keyRegistry.putAttributes(includedFile, attributes);
+			keyRegistry.addAttributes(includedFile, attributes);
 		}
 
-		Manifest manifest = keyRegistry.toManifest();
+		Manifest manifest = keyRegistry.getManifest();
 
 		FileUtil.ensureParentDirectory(manifestFile);
 

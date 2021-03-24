@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -19,28 +18,12 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class KeyRegistry {
 
-	private Map<String, Attributes> attributes = new LinkedHashMap<>();
+	private Manifest manifest = new Manifest();
 
 	private Map<String, byte[]> encodedKeys = new LinkedHashMap<>();
 
 
 	public KeyRegistry(){
-	}
-
-	public Manifest toManifest(){
-		Manifest result = new Manifest();
-
-		Map<String, Attributes> manifestEntries = result.getEntries();
-
-		Collection<Map.Entry<String, Attributes>> entries = this.attributes.entrySet();
-		for(Map.Entry<String, Attributes> entry : entries){
-			String name = entry.getKey();
-			Attributes attributes = entry.getValue();
-
-			manifestEntries.put(name, attributes);
-		}
-
-		return result;
 	}
 
 	public void load(ClassLoader classLoader) throws IOException {
@@ -52,31 +35,30 @@ public class KeyRegistry {
 			try(InputStream is = url.openStream()){
 				Manifest manifest = new Manifest(is);
 
-				load(manifest);
+				addMainAttributes(manifest.getMainAttributes());
+
+				Collection<Map.Entry<String, Attributes>> entries = (manifest.getEntries()).entrySet();
+				for(Map.Entry<String, Attributes> entry : entries){
+					addAttributes(entry.getKey(), entry.getValue());
+				}
 			}
-		}
-	}
-
-	public void load(Manifest manifest){
-		Map<String, Attributes> manifestEntries = manifest.getEntries();
-
-		Collection<Map.Entry<String, Attributes>> entries = manifestEntries.entrySet();
-		for(Map.Entry<String, Attributes> entry : entries){
-			String name = entry.getKey();
-			Attributes attributes = entry.getValue();
-
-			attributes = extractCodeVaultAttributes(attributes);
-
-			putAttributesInternal(name, attributes);
 		}
 	}
 
 	public SecretKey getSecretKey(String name){
 		Attributes attributes = getAttributes(name);
 
-		if(attributes != null){
+		return getSecretKey(attributes);
+	}
+
+	public SecretKey getSecretKey(Attributes attributes){
+
+		if(attributes != null && !attributes.isEmpty()){
 			String algorithm = (String)attributes.get(AttributeNames.CODEVAULT_ALGORITHM);
 			String secretKeyId = (String)attributes.get(AttributeNames.CODEVAULT_SECRETKEY_ID);
+			if(algorithm == null || secretKeyId == null){
+				throw new IllegalArgumentException();
+			}
 
 			byte[] encodedKey = getEncodedKey(secretKeyId);
 			if(encodedKey == null){
@@ -90,13 +72,56 @@ public class KeyRegistry {
 	}
 
 	public Attributes getAttributes(String name){
-		return this.attributes.get(name);
+		Manifest manifest = getManifest();
+
+		Attributes result = new Attributes();
+		result.putAll(manifest.getMainAttributes());
+
+		Attributes entryAttributes = manifest.getAttributes(name);
+		if(entryAttributes != null && !entryAttributes.isEmpty()){
+			result.putAll(entryAttributes);
+		}
+
+		return result;
 	}
 
-	public void putAttributes(String name, Attributes attributes){
-		attributes = extractCodeVaultAttributes(attributes);
+	public void addMainAttributes(Attributes attributes){
+		Manifest manifest = getManifest();
 
-		putAttributesInternal(name, attributes);
+		Attributes mainAttributes = manifest.getMainAttributes();
+
+		Collection<Map.Entry<Attributes.Name, ?>> entries = (Collection)attributes.entrySet();
+		for(Map.Entry<Attributes.Name, ?> entry : entries){
+
+			if(hasCodeVaultPrefix(entry.getKey())){
+				mainAttributes.put(entry.getKey(), entry.getValue());
+			}
+		}
+	}
+
+	public void addAttributes(String name, Attributes attributes){
+		Manifest manifest = getManifest();
+
+		Attributes entryAttributes = manifest.getAttributes(name);
+
+		Collection<Map.Entry<Attributes.Name, ?>> entries = (Collection)attributes.entrySet();
+		for(Map.Entry<Attributes.Name, ?> entry : entries){
+
+			if(hasCodeVaultPrefix(entry.getKey())){
+
+				if(entryAttributes == null){
+					entryAttributes = new Attributes();
+
+					(manifest.getEntries()).put(name, entryAttributes);
+				}
+
+				entryAttributes.put(entry.getKey(), entry.getValue());
+			}
+		}
+	}
+
+	public Manifest getManifest(){
+		return this.manifest;
 	}
 
 	public byte[] getEncodedKey(String id){
@@ -105,35 +130,6 @@ public class KeyRegistry {
 
 	public void putEncodedKey(String id, byte[] bytes){
 		this.encodedKeys.put(id, bytes);
-	}
-
-	private void putAttributesInternal(String name, Attributes attributes){
-
-		if(attributes != null && !attributes.isEmpty()){
-			this.attributes.put(name, attributes);
-		}
-	}
-
-	static
-	public Attributes extractCodeVaultAttributes(Attributes attributes){
-		Attributes result = null;
-
-		Set<? extends Map.Entry<?, ?>> entries = attributes.entrySet();
-		for(Map.Entry<?, ?> entry : entries){
-			Attributes.Name name = (Attributes.Name)entry.getKey();
-			Object value = entry.getValue();
-
-			if(hasCodeVaultPrefix(name)){
-
-				if(result == null){
-					result = new Attributes();
-				}
-
-				result.put(name, value);
-			}
-		}
-
-		return result;
 	}
 
 	static
